@@ -14,9 +14,7 @@ def user_profile(request) -> dict:
     role = get_role(user)
     profile = getattr(user, "profile", None)
     role_display = (
-        UserRole(role).label
-        if user.is_superuser or profile is None
-        else profile.get_role_display()
+        UserRole(role).label if user.is_superuser or profile is None else profile.get_role_display()
     )
     return {
         "current_role": role,

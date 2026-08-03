@@ -27,7 +27,5 @@ class Command(BaseCommand):
         self.stdout.write("Usuario: admin")
         self.stdout.write(f"Contraseña: {admin_password}")
         self.stdout.write(
-            self.style.WARNING(
-                "Cambie todas las contraseñas antes de una entrega real."
-            )
+            self.style.WARNING("Cambie todas las contraseñas antes de una entrega real.")
         )

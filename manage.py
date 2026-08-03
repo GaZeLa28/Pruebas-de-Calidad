@@ -2,6 +2,7 @@
 import os
 import sys
 
+
 def main() -> None:
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "coffeetrace.settings")
     try:
@@ -9,6 +10,7 @@ def main() -> None:
     except ImportError as exc:
         raise ImportError("Instale las dependencias con: pip install -r requirements.txt") from exc
     execute_from_command_line(sys.argv)
+
 
 if __name__ == "__main__":
     main()

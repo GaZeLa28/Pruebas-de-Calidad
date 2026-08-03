@@ -16,7 +16,7 @@ class HealthCheckView(APIView):
     def get(self, request):
         try:
             DatabaseHealthService.inspect()
-        except (DatabaseError, RuntimeError):
+        except DatabaseError, RuntimeError:
             return Response(
                 {"status": "unavailable", "database": "disconnected"},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,

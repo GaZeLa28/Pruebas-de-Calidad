@@ -30,7 +30,9 @@ class TestLotService:
     def test_rejects_weight_greater_than_available(self):
         actor = create_user()
         _, _, reception = create_origin(actor=actor)
-        lot = Lot.objects.create(code="L-002", name="Lote prueba", harvest_year=2026, created_by=actor)
+        lot = Lot.objects.create(
+            code="L-002", name="Lote prueba", harvest_year=2026, created_by=actor
+        )
         with pytest.raises(ValidationError):
             LotService.associate_reception(
                 lot=lot,

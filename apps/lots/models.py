@@ -28,7 +28,9 @@ class Lot(ActiveModel, TimeStampedModel):
         default=LotStatus.DRAFT,
         db_index=True,
     )
-    total_weight_kg = models.DecimalField(max_digits=14, decimal_places=2, default=0, editable=False)
+    total_weight_kg = models.DecimalField(
+        max_digits=14, decimal_places=2, default=0, editable=False
+    )
     notes = models.TextField(blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

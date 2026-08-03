@@ -60,9 +60,7 @@ class Environment:
             ) from exc
 
         if minimum is not None and value < minimum:
-            raise ImproperlyConfigured(
-                f"La variable '{name}' debe ser mayor o igual a {minimum}."
-            )
+            raise ImproperlyConfigured(f"La variable '{name}' debe ser mayor o igual a {minimum}.")
         return value
 
     @staticmethod

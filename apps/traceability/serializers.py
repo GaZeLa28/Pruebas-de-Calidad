@@ -80,9 +80,7 @@ class TraceabilityTimelineSerializer(serializers.Serializer):
         origins = list(obj.reception_links.all())
         return {
             "has_origins": bool(origins),
-            "all_weights_validated": all(
-                link.reception.status == "VALIDATED" for link in origins
-            ),
+            "all_weights_validated": all(link.reception.status == "VALIDATED" for link in origins),
             "has_events": obj.traceability_events.exists(),
             "origin_count": len(origins),
             "event_count": obj.traceability_events.count(),

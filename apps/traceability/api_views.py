@@ -21,9 +21,7 @@ class TraceabilityEventViewSet(AuditedModelViewSet):
     ordering = ["occurred_at"]
 
     def get_queryset(self):
-        queryset = TraceabilityEvent.objects.select_related(
-            "lot", "reception", "recorded_by"
-        )
+        queryset = TraceabilityEvent.objects.select_related("lot", "reception", "recorded_by")
         filters = {
             "lot_id": self.request.query_params.get("lot"),
             "event_type": self.request.query_params.get("event_type"),

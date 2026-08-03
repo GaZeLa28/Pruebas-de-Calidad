@@ -84,9 +84,9 @@ class LotReceptionAssociationService:
     @staticmethod
     def _available_weight(*, lot: Lot, reception: CoffeeReception) -> Decimal:
         links = LotReception.objects.filter(reception=reception).exclude(lot=lot)
-        used_weight = links.aggregate(
-            total=Coalesce(Sum("assigned_weight_kg"), Decimal("0.00"))
-        )["total"]
+        used_weight = links.aggregate(total=Coalesce(Sum("assigned_weight_kg"), Decimal("0.00")))[
+            "total"
+        ]
         return reception.calculated_net_weight_kg - used_weight
 
     @staticmethod

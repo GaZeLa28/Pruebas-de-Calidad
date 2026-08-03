@@ -32,9 +32,7 @@ class ProducerReportView(BaseReportView):
 class LotReportView(BaseReportView):
     def get(self, request):
         filters = self.get_filters(request)
-        rows = ReportDataService.lot_rows(
-            harvest_year=filters.validated_data.get("harvest_year")
-        )
+        rows = ReportDataService.lot_rows(harvest_year=filters.validated_data.get("harvest_year"))
         return Response({"count": len(rows), "results": rows})
 
 

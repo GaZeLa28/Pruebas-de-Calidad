@@ -3,7 +3,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from coffeetrace.config.database import SqlServerConfiguration
 
-
 _REQUIRED_ENVIRONMENT = {
     "DB_PASSWORD": "UnitTestPassword2026!",
     "DB_NAME": "CoffeeTrace",

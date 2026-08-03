@@ -9,8 +9,12 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
+
 from apps.accounts.models import UserProfile, UserRole
+
 User = get_user_model()
+
+
 class UserService:
     @staticmethod
     @transaction.atomic
@@ -20,6 +24,7 @@ class UserService:
         profile.role = role
         profile.save(update_fields=["role", "updated_at"])
         return user
+
     @staticmethod
     @transaction.atomic
     def update_user(*, user, password: str | None = None, role: str | None = None, **data):
@@ -82,5 +87,5 @@ class PasswordResetService:
         try:
             user_id = force_str(urlsafe_base64_decode(uid))
             return User.objects.get(pk=user_id, is_active=True)
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except TypeError, ValueError, OverflowError, User.DoesNotExist:
             return None

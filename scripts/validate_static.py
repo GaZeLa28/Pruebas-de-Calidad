@@ -34,18 +34,14 @@ def validate_python() -> list[str]:
             continue
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.module and not module_exists(node.module):
-                errors.append(
-                    f"{path.relative_to(ROOT)}: módulo interno inexistente {node.module}"
-                )
+                errors.append(f"{path.relative_to(ROOT)}: módulo interno inexistente {node.module}")
     return errors
 
 
 def validate_migrations() -> list[str]:
     errors: list[str] = []
     apps_with_models = [
-        path.parent
-        for path in ROOT.glob("apps/*/models.py")
-        if path.parent.name not in {"common"}
+        path.parent for path in ROOT.glob("apps/*/models.py") if path.parent.name not in {"common"}
     ]
     for app in apps_with_models:
         migrations = app / "migrations"
@@ -67,10 +63,11 @@ def validate_migrations() -> list[str]:
         "trace_type_date_idx",
         "audit_log_resource_idx",
     }
-    model_text = "\n".join(path.read_text(encoding="utf-8") for path in ROOT.glob("apps/*/models.py"))
+    model_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in ROOT.glob("apps/*/models.py")
+    )
     migration_text = "\n".join(
-        path.read_text(encoding="utf-8")
-        for path in ROOT.glob("apps/*/migrations/0*.py")
+        path.read_text(encoding="utf-8") for path in ROOT.glob("apps/*/migrations/0*.py")
     )
     for name in sorted(expected_index_names):
         if name not in model_text:
@@ -131,7 +128,6 @@ def validate_required_files() -> list[str]:
     return [f"Falta {item}" for item in required if not (ROOT / item).exists()]
 
 
-
 def validate_database_configuration() -> list[str]:
     errors: list[str] = []
     settings_text = (ROOT / "coffeetrace" / "settings.py").read_text(encoding="utf-8")
@@ -150,7 +146,7 @@ def validate_database_configuration() -> list[str]:
     required_patterns = [
         '"ENGINE": "mssql"',
         'Environment.require("DB_PASSWORD")',
-        'SqlServerConfiguration.from_environment()',
+        "SqlServerConfiguration.from_environment()",
     ]
     for pattern in required_patterns:
         if pattern not in repository_text:

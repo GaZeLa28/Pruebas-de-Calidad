@@ -35,14 +35,18 @@ class ReportQueryService:
         if date_range.end_date:
             date_filter &= Q(receptions__received_at__date__lte=date_range.end_date)
         decimal_output = DecimalField(max_digits=14, decimal_places=2)
-        return Producer.objects.filter(is_active=True).annotate(
-            reception_count=Count("receptions", filter=date_filter, distinct=True),
-            received_weight_kg=Coalesce(
-                Sum("receptions__calculated_net_weight_kg", filter=date_filter),
-                0,
-                output_field=decimal_output,
-            ),
-        ).order_by("full_name")
+        return (
+            Producer.objects.filter(is_active=True)
+            .annotate(
+                reception_count=Count("receptions", filter=date_filter, distinct=True),
+                received_weight_kg=Coalesce(
+                    Sum("receptions__calculated_net_weight_kg", filter=date_filter),
+                    0,
+                    output_field=decimal_output,
+                ),
+            )
+            .order_by("full_name")
+        )
 
     @staticmethod
     def lots_summary(*, harvest_year: int | None = None):
@@ -154,7 +158,12 @@ class PDFReportRenderer:
                     ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
                     ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                     ("GRID", (0, 0), (-1, -1), 0.35, colors.HexColor("#D8DFD8")),
-                    ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#F5F7F4")]),
+                    (
+                        "ROWBACKGROUNDS",
+                        (0, 1),
+                        (-1, -1),
+                        [colors.white, colors.HexColor("#F5F7F4")],
+                    ),
                     ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                     ("FONTSIZE", (0, 0), (-1, -1), 8),
                     ("LEFTPADDING", (0, 0), (-1, -1), 5),

@@ -2,7 +2,6 @@ from django.urls import path
 
 from apps.frontend import views
 
-
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
     path("manage/<slug:resource>/", views.resource_page, name="resource-page"),

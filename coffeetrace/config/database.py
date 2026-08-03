@@ -32,7 +32,7 @@ class SqlServerConfiguration:
     max_connection_age: int
 
     @classmethod
-    def from_environment(cls) -> "SqlServerConfiguration":
+    def from_environment(cls) -> SqlServerConfiguration:
         return cls(
             name=Environment.get("DB_NAME", "CoffeeTrace"),
             user=Environment.get("DB_USER", "coffeetrace_app"),
@@ -91,8 +91,4 @@ class SqlServerConfiguration:
     def _build_extra_params(self) -> str:
         encrypt = "yes" if self.encrypt else "no"
         trust_certificate = "yes" if self.trust_server_certificate else "no"
-        return (
-            f"Encrypt={encrypt};"
-            f"TrustServerCertificate={trust_certificate};"
-            "MARS_Connection=yes"
-        )
+        return f"Encrypt={encrypt};TrustServerCertificate={trust_certificate};MARS_Connection=yes"

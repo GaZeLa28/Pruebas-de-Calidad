@@ -20,10 +20,7 @@ class AuditService:
     @staticmethod
     def snapshot(instance) -> dict:
         values = model_to_dict(instance)
-        return {
-            key: AuditService._safe_field_value(key, value)
-            for key, value in values.items()
-        }
+        return {key: AuditService._safe_field_value(key, value) for key, value in values.items()}
 
     @staticmethod
     def record_create(request, instance) -> AuditLog:
@@ -73,8 +70,7 @@ class AuditService:
     def _json_safe(value):
         if isinstance(value, dict):
             return {
-                key: AuditService._safe_field_value(str(key), item)
-                for key, item in value.items()
+                key: AuditService._safe_field_value(str(key), item) for key, item in value.items()
             }
         if isinstance(value, (list, tuple, set)):
             return [AuditService._json_safe(item) for item in value]

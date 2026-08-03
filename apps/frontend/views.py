@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from decimal import Decimal
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -8,7 +9,6 @@ from django.db.models import DecimalField, Sum
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
-from decimal import Decimal
 
 from apps.accounts.models import UserRole
 from apps.accounts.permissions import get_role
@@ -51,7 +51,13 @@ RESOURCE_PAGES = {
         fields=[
             {"name": "code", "label": "Código", "type": "text", "required": True},
             {"name": "national_id", "label": "Identificación", "type": "text", "required": True},
-            {"name": "full_name", "label": "Nombre completo", "type": "text", "required": True, "wide": True},
+            {
+                "name": "full_name",
+                "label": "Nombre completo",
+                "type": "text",
+                "required": True,
+                "wide": True,
+            },
             {"name": "email", "label": "Correo", "type": "email"},
             {"name": "phone", "label": "Teléfono", "type": "text"},
             {"name": "address", "label": "Dirección", "type": "textarea", "wide": True},
@@ -75,9 +81,23 @@ RESOURCE_PAGES = {
             {"key": "is_active", "label": "Estado", "type": "boolean"},
         ],
         fields=[
-            {"name": "producer", "label": "Productor", "type": "remote-select", "source": "/api/v1/producers/?is_active=true&page_size=100", "value": "id", "text": "full_name", "required": True},
+            {
+                "name": "producer",
+                "label": "Productor",
+                "type": "remote-select",
+                "source": "/api/v1/producers/?is_active=true&page_size=100",
+                "value": "id",
+                "text": "full_name",
+                "required": True,
+            },
             {"name": "code", "label": "Código", "type": "text", "required": True},
-            {"name": "name", "label": "Nombre de la finca", "type": "text", "required": True, "wide": True},
+            {
+                "name": "name",
+                "label": "Nombre de la finca",
+                "type": "text",
+                "required": True,
+                "wide": True,
+            },
             {"name": "province", "label": "Provincia", "type": "text", "required": True},
             {"name": "canton", "label": "Cantón", "type": "text", "required": True},
             {"name": "district", "label": "Distrito", "type": "text", "required": True},
@@ -102,20 +122,71 @@ RESOURCE_PAGES = {
             {"key": "producer_name", "label": "Productor"},
             {"key": "farm_name", "label": "Finca"},
             {"key": "received_at", "label": "Fecha", "type": "datetime"},
-            {"key": "calculated_net_weight_kg", "label": "Peso neto", "type": "decimal", "suffix": " kg"},
+            {
+                "key": "calculated_net_weight_kg",
+                "label": "Peso neto",
+                "type": "decimal",
+                "suffix": " kg",
+            },
             {"key": "status_display", "label": "Validación", "type": "status"},
         ],
         fields=[
             {"name": "code", "label": "Código de recepción", "type": "text", "required": True},
-            {"name": "received_at", "label": "Fecha y hora", "type": "datetime-local", "required": True, "default": "now"},
-            {"name": "producer", "label": "Productor", "type": "remote-select", "source": "/api/v1/producers/?is_active=true&page_size=100", "value": "id", "text": "full_name", "required": True},
-            {"name": "farm", "label": "Finca", "type": "remote-select", "source": "/api/v1/farms/?is_active=true&page_size=100", "value": "id", "text": "name", "required": True},
+            {
+                "name": "received_at",
+                "label": "Fecha y hora",
+                "type": "datetime-local",
+                "required": True,
+                "default": "now",
+            },
+            {
+                "name": "producer",
+                "label": "Productor",
+                "type": "remote-select",
+                "source": "/api/v1/producers/?is_active=true&page_size=100",
+                "value": "id",
+                "text": "full_name",
+                "required": True,
+            },
+            {
+                "name": "farm",
+                "label": "Finca",
+                "type": "remote-select",
+                "source": "/api/v1/farms/?is_active=true&page_size=100",
+                "value": "id",
+                "text": "name",
+                "required": True,
+            },
             {"name": "coffee_variety", "label": "Variedad", "type": "text", "required": True},
             {"name": "process_type", "label": "Proceso", "type": "text"},
-            {"name": "gross_weight_kg", "label": "Peso bruto (kg)", "type": "number", "step": "0.01", "required": True},
-            {"name": "tare_weight_kg", "label": "Tara (kg)", "type": "number", "step": "0.01", "required": True, "default": 0},
-            {"name": "declared_net_weight_kg", "label": "Peso neto declarado (kg)", "type": "number", "step": "0.01", "required": True},
-            {"name": "moisture_percentage", "label": "Humedad (%)", "type": "number", "step": "0.01"},
+            {
+                "name": "gross_weight_kg",
+                "label": "Peso bruto (kg)",
+                "type": "number",
+                "step": "0.01",
+                "required": True,
+            },
+            {
+                "name": "tare_weight_kg",
+                "label": "Tara (kg)",
+                "type": "number",
+                "step": "0.01",
+                "required": True,
+                "default": 0,
+            },
+            {
+                "name": "declared_net_weight_kg",
+                "label": "Peso neto declarado (kg)",
+                "type": "number",
+                "step": "0.01",
+                "required": True,
+            },
+            {
+                "name": "moisture_percentage",
+                "label": "Humedad (%)",
+                "type": "number",
+                "step": "0.01",
+            },
             {"name": "notes", "label": "Observaciones", "type": "textarea", "wide": True},
         ],
     ),
@@ -140,7 +211,18 @@ RESOURCE_PAGES = {
             {"name": "name", "label": "Nombre", "type": "text", "required": True},
             {"name": "harvest_year", "label": "Año de cosecha", "type": "number", "required": True},
             {"name": "warehouse_location", "label": "Ubicación en bodega", "type": "text"},
-            {"name": "status", "label": "Estado", "type": "select", "required": True, "options": [{"value": "DRAFT", "text": "Borrador"}, {"value": "IN_PROCESS", "text": "En proceso"}, {"value": "CERTIFIED", "text": "Certificado"}, {"value": "CLOSED", "text": "Cerrado"}]},
+            {
+                "name": "status",
+                "label": "Estado",
+                "type": "select",
+                "required": True,
+                "options": [
+                    {"value": "DRAFT", "text": "Borrador"},
+                    {"value": "IN_PROCESS", "text": "En proceso"},
+                    {"value": "CERTIFIED", "text": "Certificado"},
+                    {"value": "CLOSED", "text": "Cerrado"},
+                ],
+            },
             {"name": "notes", "label": "Observaciones", "type": "textarea", "wide": True},
             {"name": "is_active", "label": "Lote activo", "type": "checkbox", "default": True},
         ],
@@ -161,12 +243,54 @@ RESOURCE_PAGES = {
             {"key": "recorded_by_name", "label": "Registrado por"},
         ],
         fields=[
-            {"name": "lot", "label": "Lote", "type": "remote-select", "source": "/api/v1/lots/?page_size=100", "value": "id", "text": "code", "required": True},
-            {"name": "reception", "label": "Recepción asociada (opcional)", "type": "remote-select", "source": "/api/v1/receptions/?page_size=100", "value": "id", "text": "code"},
-            {"name": "event_type", "label": "Tipo de evento", "type": "select", "required": True, "options": [{"value": "RECEPTION", "text": "Recepción"}, {"value": "LOT_CREATED", "text": "Creación de lote"}, {"value": "ASSOCIATION", "text": "Asociación"}, {"value": "PROCESSING", "text": "Proceso productivo"}, {"value": "QUALITY", "text": "Control de calidad"}, {"value": "CERTIFICATION", "text": "Certificación"}, {"value": "DISPATCH", "text": "Despacho"}, {"value": "CORRECTION", "text": "Corrección"}]},
-            {"name": "occurred_at", "label": "Fecha y hora", "type": "datetime-local", "required": True, "default": "now"},
+            {
+                "name": "lot",
+                "label": "Lote",
+                "type": "remote-select",
+                "source": "/api/v1/lots/?page_size=100",
+                "value": "id",
+                "text": "code",
+                "required": True,
+            },
+            {
+                "name": "reception",
+                "label": "Recepción asociada (opcional)",
+                "type": "remote-select",
+                "source": "/api/v1/receptions/?page_size=100",
+                "value": "id",
+                "text": "code",
+            },
+            {
+                "name": "event_type",
+                "label": "Tipo de evento",
+                "type": "select",
+                "required": True,
+                "options": [
+                    {"value": "RECEPTION", "text": "Recepción"},
+                    {"value": "LOT_CREATED", "text": "Creación de lote"},
+                    {"value": "ASSOCIATION", "text": "Asociación"},
+                    {"value": "PROCESSING", "text": "Proceso productivo"},
+                    {"value": "QUALITY", "text": "Control de calidad"},
+                    {"value": "CERTIFICATION", "text": "Certificación"},
+                    {"value": "DISPATCH", "text": "Despacho"},
+                    {"value": "CORRECTION", "text": "Corrección"},
+                ],
+            },
+            {
+                "name": "occurred_at",
+                "label": "Fecha y hora",
+                "type": "datetime-local",
+                "required": True,
+                "default": "now",
+            },
             {"name": "location", "label": "Ubicación", "type": "text"},
-            {"name": "description", "label": "Descripción", "type": "textarea", "required": True, "wide": True},
+            {
+                "name": "description",
+                "label": "Descripción",
+                "type": "textarea",
+                "required": True,
+                "wide": True,
+            },
         ],
     ),
 }
@@ -179,13 +303,19 @@ def dashboard(request):
     reception_weight = CoffeeReception.objects.filter(
         received_at__year=current_year,
         received_at__month=current_month,
-    ).aggregate(total=Coalesce(Sum("calculated_net_weight_kg"), Decimal("0.00"), output_field=DecimalField()))["total"]
+    ).aggregate(
+        total=Coalesce(
+            Sum("calculated_net_weight_kg"), Decimal("0.00"), output_field=DecimalField()
+        )
+    )["total"]
     context = {
         "producer_count": Producer.objects.filter(is_active=True).count(),
         "farm_count": Farm.objects.filter(is_active=True).count(),
         "active_lot_count": Lot.objects.filter(is_active=True).exclude(status="CLOSED").count(),
         "open_inconsistency_count": WeightInconsistency.objects.filter(status="OPEN").count(),
-        "validated_reception_count": CoffeeReception.objects.filter(status=ReceptionStatus.VALIDATED).count(),
+        "validated_reception_count": CoffeeReception.objects.filter(
+            status=ReceptionStatus.VALIDATED
+        ).count(),
         "reception_weight": reception_weight,
         "recent_receptions": CoffeeReception.objects.select_related("producer", "farm")[:6],
         "recent_lots": Lot.objects.select_related("created_by")[:5],

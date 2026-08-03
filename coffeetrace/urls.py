@@ -2,9 +2,11 @@ from django.contrib import admin
 from django.contrib.auth.views import (
     LogoutView,
     PasswordResetCompleteView,
-    PasswordResetConfirmView as DjangoPasswordResetConfirmView,
     PasswordResetDoneView,
     PasswordResetView,
+)
+from django.contrib.auth.views import (
+    PasswordResetConfirmView as DjangoPasswordResetConfirmView,
 )
 from django.urls import include, path, reverse_lazy
 from rest_framework.routers import DefaultRouter
@@ -25,15 +27,20 @@ from apps.frontend.views import public_qr_page
 from apps.lots.api_views import LotViewSet
 from apps.producers.api_views import FarmViewSet, ProducerViewSet
 from apps.receptions.api_views import CoffeeReceptionViewSet, WeightInconsistencyViewSet
-from apps.traceability.api_views import LotTimelineView, PublicQRTraceabilityView, TraceabilityEventViewSet
-
+from apps.traceability.api_views import (
+    LotTimelineView,
+    PublicQRTraceabilityView,
+    TraceabilityEventViewSet,
+)
 
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="user")
 router.register("producers", ProducerViewSet, basename="producer")
 router.register("farms", FarmViewSet, basename="farm")
 router.register("receptions", CoffeeReceptionViewSet, basename="reception")
-router.register("weight-inconsistencies", WeightInconsistencyViewSet, basename="weight-inconsistency")
+router.register(
+    "weight-inconsistencies", WeightInconsistencyViewSet, basename="weight-inconsistency"
+)
 router.register("lots", LotViewSet, basename="lot")
 router.register("traceability-events", TraceabilityEventViewSet, basename="traceability-event")
 router.register("audit-logs", AuditLogViewSet, basename="audit-log")
@@ -90,11 +97,19 @@ urlpatterns = [
         name="api-password-reset-confirm",
     ),
     path("api/v1/traceability/lots/<int:lot_id>/", LotTimelineView.as_view(), name="lot-timeline"),
-    path("api/v1/traceability/qr/<uuid:token>/", PublicQRTraceabilityView.as_view(), name="public-qr-api"),
+    path(
+        "api/v1/traceability/qr/<uuid:token>/",
+        PublicQRTraceabilityView.as_view(),
+        name="public-qr-api",
+    ),
     path("api/v1/reports/", include("apps.reports.urls")),
     path(
         "api/schema/",
-        get_schema_view(title="CoffeeTrace API", description="API REST de trazabilidad cafetalera", version="2.0.0"),
+        get_schema_view(
+            title="CoffeeTrace API",
+            description="API REST de trazabilidad cafetalera",
+            version="2.0.0",
+        ),
         name="openapi-schema",
     ),
     path("api-auth/", include("rest_framework.urls")),

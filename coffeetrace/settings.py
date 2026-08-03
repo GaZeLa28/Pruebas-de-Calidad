@@ -86,12 +86,7 @@ SQL_SERVER = SqlServerConfiguration.from_environment()
 DATABASES = {"default": SQL_SERVER.as_django_database()}
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "UserAttributeSimilarityValidator"
-        )
-    },
+    {"NAME": ("django.contrib.auth.password_validation.UserAttributeSimilarityValidator")},
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         "OPTIONS": {"min_length": 10},
@@ -134,9 +129,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "DEFAULT_PAGINATION_CLASS": (
-        "apps.common.pagination.StandardResultsSetPagination"
-    ),
+    "DEFAULT_PAGINATION_CLASS": ("apps.common.pagination.StandardResultsSetPagination"),
     "PAGE_SIZE": Environment.get_int("DEFAULT_PAGE_SIZE", 20, minimum=1),
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",

@@ -29,9 +29,7 @@ class Command(BaseCommand):
         self.stdout.write(f"  INSERT: {self._yes_no(health.can_insert)}")
         self.stdout.write(f"  UPDATE: {self._yes_no(health.can_update)}")
         self.stdout.write(f"  DELETE: {self._yes_no(health.can_delete)}")
-        self.stdout.write(
-            f"  CREATE TABLE: {self._yes_no(health.can_create_table)}"
-        )
+        self.stdout.write(f"  CREATE TABLE: {self._yes_no(health.can_create_table)}")
 
     @staticmethod
     def _yes_no(value: bool) -> str:

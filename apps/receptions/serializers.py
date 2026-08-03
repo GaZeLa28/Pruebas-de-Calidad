@@ -47,7 +47,9 @@ class CoffeeReceptionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        return ReceptionService.create(actor=self.context["request"].user, validated_data=validated_data)
+        return ReceptionService.create(
+            actor=self.context["request"].user, validated_data=validated_data
+        )
 
     def update(self, instance, validated_data):
         return ReceptionService.update(reception=instance, validated_data=validated_data)

@@ -28,7 +28,9 @@ class TraceabilityEvent(TimeStampedModel):
         blank=True,
         related_name="traceability_events",
     )
-    event_type = models.CharField(max_length=30, choices=TraceabilityEventType.choices, db_index=True)
+    event_type = models.CharField(
+        max_length=30, choices=TraceabilityEventType.choices, db_index=True
+    )
     occurred_at = models.DateTimeField(db_index=True)
     location = models.CharField(max_length=180, blank=True)
     description = models.TextField()
