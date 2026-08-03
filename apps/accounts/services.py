@@ -17,26 +17,55 @@ User = get_user_model()
 
 class UserService:
     @staticmethod
-    @transaction.atomic
-    def create_user(*, password: str, role: str = UserRole.VIEWER, **validated_data):
-        user = User.objects.create_user(password=password, **validated_data)
-        profile, _ = UserProfile.objects.get_or_create(user=user)
+    def _get_profile(user) -> UserProfile:
+        try:
+            return user.profile
+        except UserProfile.DoesNotExist:
+            return UserProfile.objects.create(user=user)
+
+    @classmethod
+    def _set_role(cls, *, user, role: str) -> None:
+        profile = cls._get_profile(user)
         profile.role = role
         profile.save(update_fields=["role", "updated_at"])
+
+    @classmethod
+    @transaction.atomic
+    def create_user(
+        cls,
+        *,
+        password: str,
+        role: str = UserRole.VIEWER,
+        **validated_data,
+    ):
+        user = User.objects.create_user(
+            password=password,
+            **validated_data,
+        )
+        cls._set_role(user=user, role=role)
         return user
 
-    @staticmethod
+    @classmethod
     @transaction.atomic
-    def update_user(*, user, password: str | None = None, role: str | None = None, **data):
+    def update_user(
+        cls,
+        *,
+        user,
+        password: str | None = None,
+        role: str | None = None,
+        **data,
+    ):
         for field, value in data.items():
             setattr(user, field, value)
+
         if password:
             user.set_password(password)
+
         user.save()
+
         if role is not None:
-            profile, _ = UserProfile.objects.get_or_create(user=user)
-            profile.role = role
-            profile.save(update_fields=["role", "updated_at"])
+            cls._set_role(user=user, role=role)
+
         return user
 
 
