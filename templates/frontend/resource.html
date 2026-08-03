@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ resource.title }} | CoffeeTrace{% endblock %}
+{% block content %}
+<section class="page-heading heading-split">
+  <div><p class="eyebrow">{{ resource.eyebrow }}</p><h1>{{ resource.title }}</h1><p>{{ resource.description }}</p></div>
+  {% if resource.can_write %}<button class="button button-primary" type="button" data-open-resource-modal>+ {{ resource.create_label }}</button>{% endif %}
+</section>
+<section class="panel resource-panel" data-resource-root>
+  <div class="resource-toolbar">
+    <label class="search-control"><span aria-hidden="true">⌕</span><span class="sr-only">Buscar</span><input type="search" data-resource-search placeholder="{{ resource.search_placeholder }}"></label>
+    <div class="toolbar-meta"><span data-result-count>0 registros</span><button class="button button-ghost button-small" type="button" data-resource-refresh>Actualizar</button></div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>{% for column in resource.columns %}<th>{{ column.label }}</th>{% endfor %}{% if resource.can_write %}<th><span class="sr-only">Acciones</span></th>{% endif %}</tr></thead>
+      <tbody data-resource-table><tr><td colspan="{% if resource.can_write %}{{ resource.columns|length|add:1 }}{% else %}{{ resource.columns|length }}{% endif %}"><div class="loading-state"><span class="spinner"></span> Cargando información…</div></td></tr></tbody>
+    </table>
+  </div>
+  <div class="pagination" data-pagination hidden><button type="button" class="button button-ghost button-small" data-page-prev>Anterior</button><span data-page-label></span><button type="button" class="button button-ghost button-small" data-page-next>Siguiente</button></div>
+</section>
+{% if resource.can_write %}<dialog class="modal" data-resource-modal aria-labelledby="resource-modal-title">
+  <form method="dialog" class="modal-card" data-resource-form>
+    <div class="modal-header"><div><p class="eyebrow">Registro</p><h2 id="resource-modal-title" data-modal-title>{{ resource.create_label }}</h2></div><button type="button" class="icon-button" data-close-resource-modal aria-label="Cerrar">×</button></div>
+    <div class="form-grid" data-form-fields></div>
+    <div class="form-error" data-form-error hidden></div>
+    <div class="modal-actions"><button type="button" class="button button-ghost" data-close-resource-modal>Cancelar</button><button type="submit" class="button button-primary" data-form-submit>Guardar</button></div>
+  </form>
+</dialog>{% endif %}
+{{ resource|json_script:'resource-config' }}
+{% endblock %}
+{% block scripts %}<script defer src="{% static 'js/resource.js' %}"></script>{% endblock %}

@@ -1,0 +1,17 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Trazabilidad {{ lot.code }} | CoffeeTrace</title><link rel="stylesheet" href="{% static 'css/app.css' %}"></head>
+<body class="public-body">
+<header class="public-header"><div class="brand"><span class="brand-mark"><svg viewBox="0 0 48 48"><path d="M31.7 7.4C22.6 5.1 13.1 10.9 10 20.1c-3.1 9.1 1.6 18.7 10.7 21.7 9.2 3 18.8-1.7 21.9-10.8 3.1-9.1-1.8-18.4-10.9-23.6Zm-11 27.8c-5-5.9-3.4-15.1 3.5-20.5 2.2-1.7 4.6-2.8 7-3.4-5 6-7.4 13.6-6.7 21.1.2 2.1.8 4.1 1.6 6-2-.5-3.8-1.6-5.4-3.2Z"/></svg></span><span><strong>CoffeeTrace</strong><small>Origen verificado</small></span></div><span class="verified-chip">✓ Información verificable</span></header>
+<main class="public-main">
+  <section class="public-hero"><p class="eyebrow light">Trazabilidad del lote</p><h1>{{ lot.code }}</h1><p>{{ lot.name }} · Cosecha {{ lot.harvest_year }}</p><div class="public-stat-row"><div><strong>{{ lot.total_weight_kg }}</strong><span>kg consolidados</span></div><div><strong>{{ timeline.integrity.origin_count }}</strong><span>orígenes</span></div><div><strong>{{ timeline.integrity.event_count }}</strong><span>eventos</span></div></div></section>
+  <section class="public-grid">
+    <article class="public-card"><p class="eyebrow">Origen</p><h2>Productores y fincas</h2><div class="origin-list">{% for origin in origins %}<div class="origin-item"><span class="origin-icon">◎</span><div><strong>{{ origin.reception.producer.full_name }}</strong><small>{{ origin.reception.farm.name }} · Recepción {{ origin.reception.code }}</small><b>{{ origin.assigned_weight_kg }} kg</b></div></div>{% empty %}<p class="muted">Sin orígenes publicados.</p>{% endfor %}</div></article>
+    <article class="public-card"><p class="eyebrow">Recorrido</p><h2>Historia del lote</h2><ol class="timeline public-timeline">{% for event in events %}<li><span class="timeline-marker"></span><div class="timeline-card"><div class="timeline-top"><span class="status-pill">{{ event.get_event_type_display }}</span><time>{{ event.occurred_at|date:'d M Y' }}</time></div><h3>{{ event.description }}</h3>{% if event.location %}<p>{{ event.location }}</p>{% endif %}</div></li>{% empty %}<p class="muted">Sin eventos publicados.</p>{% endfor %}</ol></article>
+  </section>
+  <section class="verification-card"><span class="integrity-icon">✓</span><div><strong>Registro emitido por CoffeeTrace</strong><p>Los datos se consultaron directamente desde el registro de la cooperativa. Código del lote: {{ lot.code }}.</p></div></section>
+</main>
+<footer class="public-footer">CoffeeTrace · Transparencia desde la finca hasta el comprador</footer>
+</body>
+</html>
