@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Reportes | CoffeeTrace{% endblock %}
+{% block content %}
+<section class="page-heading"><p class="eyebrow">Análisis y auditoría</p><h1>Centro de reportes</h1><p>Consulte indicadores y exporte evidencia operativa en formatos listos para análisis.</p></section>
+<div class="report-grid">
+  <article class="report-card"><span class="report-icon">◎</span><div><p class="eyebrow">HU10</p><h2>Recepciones por productor</h2><p>Consolida cantidad de entregas y peso recibido por productor dentro de un rango de fechas.</p><div class="report-actions"><a class="button button-secondary" href="/api/v1/reports/producers/">Ver JSON</a><a class="button button-primary" href="/api/v1/reports/producers/export.xlsx">Excel</a><a class="button button-ghost" href="/api/v1/reports/producers/export.pdf">PDF</a></div></div></article>
+  <article class="report-card"><span class="report-icon">▦</span><div><p class="eyebrow">HU11 / HU14</p><h2>Producción por lote</h2><p>Resume peso, productores, orígenes y eventos de trazabilidad de cada lote.</p><div class="report-actions"><a class="button button-secondary" href="/api/v1/reports/lots/">Ver JSON</a><a class="button button-primary" href="/api/v1/reports/lots/export.xlsx">Excel</a><a class="button button-ghost" href="/api/v1/reports/lots/export.pdf">PDF</a></div></div></article>
+  <article class="report-card report-card-dark"><span class="report-icon">◫</span><div><p class="eyebrow light">Auditoría</p><h2>Historial de cambios</h2><p>Revise quién creó o modificó registros críticos, con valores anteriores y posteriores.</p><div class="report-actions"><a class="button button-light" href="/api/v1/audit-logs/">Abrir auditoría API</a></div></div></article>
+</div>
+<section class="panel report-note"><span class="note-icon">i</span><div><strong>Filtros disponibles</strong><p>Agregue <code>?start_date=2026-01-01&amp;end_date=2026-12-31</code> al reporte por productor o <code>?harvest_year=2026</code> al reporte por lote.</p></div></section>
+{% endblock %}

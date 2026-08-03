@@ -1,0 +1,31 @@
+[project]
+name = "coffeetrace"
+version = "2.0.0"
+description = "Sistema de trazabilidad de materias primas para cooperativas cafetaleras"
+requires-python = ">=3.14,<3.15"
+readme = "README.md"
+license = { text = "Academic use" }
+authors = [{ name = "Grupo 6 - ULACIT" }]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+extend-exclude = ["*/migrations/*", "docs/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "DJ"]
+ignore = ["DJ001"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "coffeetrace.settings"
+python_files = ["test_*.py", "*_tests.py"]
+addopts = "-q --disable-warnings --strict-markers"
+
+[tool.coverage.run]
+source = ["apps", "coffeetrace"]
+omit = ["*/migrations/*", "*/tests/*", "manage.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+fail_under = 80

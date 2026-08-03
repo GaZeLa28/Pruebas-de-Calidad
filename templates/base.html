@@ -1,0 +1,75 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CoffeeTrace: trazabilidad confiable para cooperativas cafetaleras.">
+  <title>{% block title %}CoffeeTrace{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script defer src="{% static 'js/app.js' %}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="app-body">
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img"><path d="M31.7 7.4C22.6 5.1 13.1 10.9 10 20.1c-3.1 9.1 1.6 18.7 10.7 21.7 9.2 3 18.8-1.7 21.9-10.8 3.1-9.1-1.8-18.4-10.9-23.6Zm-11 27.8c-5-5.9-3.4-15.1 3.5-20.5 2.2-1.7 4.6-2.8 7-3.4-5 6-7.4 13.6-6.7 21.1.2 2.1.8 4.1 1.6 6-2-.5-3.8-1.6-5.4-3.2Z"/></svg>
+        </span>
+        <span><strong>CoffeeTrace</strong><small>Trazabilidad cafetalera</small></span>
+      </div>
+      <nav class="nav-list">
+        <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}">
+          <span class="nav-icon">⌂</span><span>Inicio</span>
+        </a>
+        <p class="nav-section">Operación</p>
+        <a href="{% url 'resource-page' 'producers' %}" class="nav-item"><span class="nav-icon">◎</span><span>Productores</span></a>
+        <a href="{% url 'resource-page' 'farms' %}" class="nav-item"><span class="nav-icon">⌖</span><span>Fincas</span></a>
+        <a href="{% url 'resource-page' 'receptions' %}" class="nav-item"><span class="nav-icon">⇣</span><span>Recepciones</span></a>
+        <a href="{% url 'resource-page' 'lots' %}" class="nav-item"><span class="nav-icon">▦</span><span>Lotes</span></a>
+        <p class="nav-section">Control</p>
+        <a href="{% url 'resource-page' 'events' %}" class="nav-item"><span class="nav-icon">↝</span><span>Trazabilidad</span></a>
+        {% if current_role == 'ADMIN' or current_role == 'AUDITOR' %}
+        <a href="{% url 'reports-page' %}" class="nav-item"><span class="nav-icon">▥</span><span>Reportes</span></a>
+        <a href="/api/v1/audit-logs/" class="nav-item"><span class="nav-icon">◫</span><span>Auditoría API</span></a>
+        {% endif %}
+        {% if current_role == 'ADMIN' %}
+        <a href="/admin/" class="nav-item"><span class="nav-icon">⚙</span><span>Administración</span></a>
+        {% endif %}
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <span class="avatar">{{ request.user.first_name|default:request.user.username|slice:':1'|upper }}</span>
+          <span class="user-chip-copy"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><small>{{ current_role_display }}</small></span>
+        </div>
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button class="icon-button" type="submit" aria-label="Cerrar sesión" title="Cerrar sesión">↪</button>
+        </form>
+      </div>
+    </aside>
+    <div class="content-area">
+      <header class="topbar">
+        <button class="icon-button mobile-menu" type="button" data-sidebar-toggle aria-label="Abrir menú">☰</button>
+        <div class="topbar-context"><span class="status-dot"></span> Sistema operativo</div>
+        <div class="topbar-actions">
+          <a class="button button-ghost button-small" href="/api/schema/">API</a>
+          <time data-current-date></time>
+        </div>
+      </header>
+      <main id="main-content" class="main-content" tabindex="-1">
+        {% if messages %}
+          <div class="messages" aria-live="polite">
+          {% for message in messages %}<div class="alert">{{ message }}</div>{% endfor %}
+          </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+  <div class="toast-region" data-toast-region aria-live="polite" aria-atomic="true"></div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

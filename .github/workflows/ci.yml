@@ -1,0 +1,108 @@
+name: CoffeeTrace CI - SQL Server
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: CoffeeTrace_CI_2026!
+        ports:
+          - 1433:1433
+    env:
+      DJANGO_SECRET_KEY: ci-only-secret-key
+      DJANGO_DEBUG: "True"
+      DB_NAME: CoffeeTraceCI
+      DB_USER: sa
+      DB_PASSWORD: CoffeeTrace_CI_2026!
+      DB_HOST: 127.0.0.1
+      DB_PORT: 1433
+      DB_DRIVER: ODBC Driver 18 for SQL Server
+      DB_ENCRYPT: "True"
+      DB_TRUST_SERVER_CERTIFICATE: "True"
+      DB_CONNECTION_RETRIES: 10
+      DB_RETRY_BACKOFF_SECONDS: 3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install ODBC Driver 18
+        shell: bash
+        run: |
+          set -e
+          source /etc/os-release
+          curl -sSL https://packages.microsoft.com/keys/microsoft.asc \
+            | gpg --dearmor \
+            | sudo tee /usr/share/keyrings/microsoft-prod.gpg >/dev/null
+          curl -sSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/prod.list" \
+            | sed 's#signed-by=/usr/share/keyrings/microsoft-prod.gpg#signed-by=/usr/share/keyrings/microsoft-prod.gpg#' \
+            | sudo tee /etc/apt/sources.list.d/microsoft-prod.list >/dev/null
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Create isolated CI database
+        shell: python
+        run: |
+          import time
+          import pyodbc
+
+          connection_string = (
+              "DRIVER={ODBC Driver 18 for SQL Server};"
+              "SERVER=127.0.0.1,1433;"
+              "DATABASE=master;"
+              "UID=sa;"
+              "PWD=CoffeeTrace_CI_2026!;"
+              "Encrypt=yes;TrustServerCertificate=yes;"
+          )
+          for attempt in range(30):
+              try:
+                  connection = pyodbc.connect(connection_string, autocommit=True, timeout=3)
+                  break
+              except pyodbc.Error:
+                  if attempt == 29:
+                      raise
+                  time.sleep(2)
+          with connection.cursor() as cursor:
+              cursor.execute(
+                  "IF DB_ID(N'CoffeeTraceCI') IS NULL CREATE DATABASE [CoffeeTraceCI];"
+              )
+          connection.close()
+
+      - name: Static validation
+        run: python scripts/validate_static.py
+
+      - name: Django checks
+        run: |
+          python manage.py check
+          python manage.py makemigrations --check --dry-run
+          python manage.py check_database
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Migrate test database
+        run: python manage.py migrate --noinput
+
+      - name: Tests and coverage
+        run: pytest --cov=apps --cov=coffeetrace --cov-report=term-missing --cov-report=xml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
