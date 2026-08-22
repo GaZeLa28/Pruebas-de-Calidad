@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Panel general | CoffeeTrace{% endblock %}
+{% block content %}
+<section class="page-heading heading-split">
+  <div>
+    <p class="eyebrow">Resumen operativo</p>
+    <h1>Buenos días, {{ request.user.first_name|default:request.user.username }}</h1>
+    <p>Visibilidad inmediata del origen, recepción y consolidación del café.</p>
+  </div>
+  {% if can_write_operational_data %}
+  <div class="heading-actions">
+    <a class="button button-secondary" href="{% url 'resource-page' 'receptions' %}">Registrar recepción</a>
+    <a class="button button-primary" href="{% url 'resource-page' 'lots' %}">Crear lote</a>
+  </div>
+  {% endif %}
+</section>
+<section class="metric-grid" aria-label="Indicadores principales">
+  <article class="metric-card"><span class="metric-icon">◎</span><div><span class="metric-label">Productores activos</span><strong>{{ producer_count }}</strong><small>{{ farm_count }} fincas registradas</small></div></article>
+  <article class="metric-card"><span class="metric-icon">⇣</span><div><span class="metric-label">Peso recibido este mes</span><strong>{{ reception_weight|floatformat:2 }} kg</strong><small>{{ validated_reception_count }} recepciones validadas</small></div></article>
+  <article class="metric-card"><span class="metric-icon">▦</span><div><span class="metric-label">Lotes en operación</span><strong>{{ active_lot_count }}</strong><small>Activos y no cerrados</small></div></article>
+  <article class="metric-card {% if open_inconsistency_count %}metric-warning{% endif %}"><span class="metric-icon">!</span><div><span class="metric-label">Alertas de peso</span><strong>{{ open_inconsistency_count }}</strong><small>Inconsistencias abiertas</small></div></article>
+</section>
+<div class="dashboard-grid">
+  <section class="panel panel-wide">
+    <div class="panel-header"><div><p class="eyebrow">Actividad reciente</p><h2>Últimas recepciones</h2></div><a href="{% url 'resource-page' 'receptions' %}">Ver todas →</a></div>
+    <div class="table-wrap">
+      <table class="data-table compact">
+        <thead><tr><th>Recepción</th><th>Productor</th><th>Finca</th><th>Peso neto</th><th>Estado</th></tr></thead>
+        <tbody>
+          {% for item in recent_receptions %}
+          <tr><td><strong>{{ item.code }}</strong><small>{{ item.received_at|date:'d M Y, H:i' }}</small></td><td>{{ item.producer.full_name }}</td><td>{{ item.farm.name }}</td><td>{{ item.calculated_net_weight_kg }} kg</td><td><span class="status-pill status-{{ item.status|lower }}">{{ item.get_status_display }}</span></td></tr>
+          {% empty %}<tr><td colspan="5"><div class="empty-inline">Aún no hay recepciones registradas.</div></td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <aside class="panel">
+    <div class="panel-header"><div><p class="eyebrow">Control</p><h2>Lotes recientes</h2></div></div>
+    <div class="lot-list">
+      {% for item in recent_lots %}
+      <a href="{% url 'lot-detail' item.id %}" class="lot-list-item"><span class="lot-badge">{{ item.harvest_year|stringformat:'s'|slice:'-2:' }}</span><span><strong>{{ item.code }}</strong><small>{{ item.name }} · {{ item.total_weight_kg }} kg</small></span><span aria-hidden="true">→</span></a>
+      {% empty %}<div class="empty-inline">No hay lotes creados.</div>{% endfor %}
+    </div>
+  </aside>
+  <section class="panel panel-wide">
+    <div class="panel-header"><div><p class="eyebrow">Auditoría</p><h2>Movimientos del sistema</h2></div></div>
+    <div class="activity-list">
+      {% for item in recent_activity %}
+      <div class="activity-item"><span class="activity-dot"></span><div><strong>{{ item.action }} · {{ item.object_repr }}</strong><small>{{ item.actor.get_full_name|default:item.actor.username|default:'Sistema' }} · {{ item.created_at|timesince }} atrás</small></div></div>
+      {% empty %}<div class="empty-inline">La actividad aparecerá aquí después del primer cambio.</div>{% endfor %}
+    </div>
+  </section>
+  <aside class="panel accent-panel">
+    <p class="eyebrow light">Integridad</p><h2>Una cadena confiable empieza con datos completos.</h2><p>Valide los pesos antes de asociar una recepción a un lote y registre cada evento importante.</p><a href="{% url 'resource-page' 'events' %}" class="button button-light">Revisar trazabilidad</a>
+  </aside>
+</div>
+{% endblock %}

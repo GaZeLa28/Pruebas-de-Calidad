@@ -1,0 +1,55 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesión | CoffeeTrace</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="login-body">
+  <main class="login-layout">
+    <section class="login-story" aria-label="Acerca de CoffeeTrace">
+      <div class="story-overlay"></div>
+      <div class="story-content">
+        <div class="brand brand-on-dark">
+          <span class="brand-mark"><svg viewBox="0 0 48 48"><path d="M31.7 7.4C22.6 5.1 13.1 10.9 10 20.1c-3.1 9.1 1.6 18.7 10.7 21.7 9.2 3 18.8-1.7 21.9-10.8 3.1-9.1-1.8-18.4-10.9-23.6Zm-11 27.8c-5-5.9-3.4-15.1 3.5-20.5 2.2-1.7 4.6-2.8 7-3.4-5 6-7.4 13.6-6.7 21.1.2 2.1.8 4.1 1.6 6-2-.5-3.8-1.6-5.4-3.2Z"/></svg></span>
+          <span><strong>CoffeeTrace</strong><small>Trazabilidad cafetalera</small></span>
+        </div>
+        <div>
+          <p class="eyebrow light">Del origen a la taza</p>
+          <h1>La historia de cada lote, clara y verificable.</h1>
+          <p>Digitalice recepciones, consolide lotes y entregue confianza a productores, auditores y compradores.</p>
+        </div>
+        <div class="story-proof"><span>✓</span> Registro auditable <span>✓</span> Control de pesos <span>✓</span> Consulta por QR</div>
+      </div>
+    </section>
+    <section class="login-panel">
+      <div class="login-card">
+        <p class="eyebrow">Acceso seguro</p>
+        <h2>Bienvenido de nuevo</h2>
+        <p class="muted">Ingrese sus credenciales para administrar la trazabilidad.</p>
+        {% if form.errors %}<div class="form-error" role="alert">Usuario o contraseña incorrectos. Revise los datos e intente nuevamente.</div>{% endif %}
+        <form method="post" class="stack-form" novalidate>
+          {% csrf_token %}
+          <div class="field-group">
+            <label for="id_username">Usuario</label>
+            <input id="id_username" name="username" type="text" autocomplete="username" required autofocus placeholder="Ej. administrador" value="{{ form.username.value|default:'' }}">
+          </div>
+          <div class="field-group">
+            <label for="id_password">Contraseña</label>
+            <div class="password-field">
+              <input id="id_password" name="password" type="password" autocomplete="current-password" required placeholder="Ingrese su contraseña">
+              <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña">Ver</button>
+            </div>
+          </div>
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+          <button class="button button-primary button-full" type="submit">Ingresar al sistema</button>
+        </form>
+        <p class="login-help"><a href="{% url 'password_reset' %}">¿Olvidó su contraseña?</a> · También puede contactar al administrador.</p>
+      </div>
+    </section>
+  </main>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

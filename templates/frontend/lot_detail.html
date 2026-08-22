@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ lot.code }} | CoffeeTrace{% endblock %}
+{% block content %}
+<section class="page-heading heading-split">
+  <div><a class="back-link" href="{% url 'resource-page' 'lots' %}">← Volver a lotes</a><p class="eyebrow">Ficha de trazabilidad</p><h1>{{ lot.code }} · {{ lot.name }}</h1><p>Cosecha {{ lot.harvest_year }} · {{ lot.get_status_display }} · {{ lot.total_weight_kg }} kg consolidados</p></div>
+  {% if can_write_operational_data %}<div class="heading-actions"><button class="button button-ghost" data-associate-reception data-lot-id="{{ lot.id }}">Asociar recepción</button><button class="button button-secondary" data-generate-qr data-lot-id="{{ lot.id }}">Generar QR</button><a class="button button-primary" href="{% url 'resource-page' 'events' %}">Registrar evento</a></div>{% endif %}
+</section>
+<section class="integrity-banner {% if timeline.integrity.all_weights_validated %}is-good{% else %}is-warning{% endif %}">
+  <span class="integrity-icon">{% if timeline.integrity.all_weights_validated %}✓{% else %}!{% endif %}</span>
+  <div><strong>{% if timeline.integrity.all_weights_validated %}Pesos de origen validados{% else %}Hay datos pendientes de validación{% endif %}</strong><p>{{ timeline.integrity.origin_count }} recepciones de origen y {{ timeline.integrity.event_count }} eventos documentados.</p></div>
+</section>
+<div class="detail-grid">
+  <section class="panel panel-wide">
+    <div class="panel-header"><div><p class="eyebrow">Cadena de custodia</p><h2>Línea de tiempo</h2></div></div>
+    <ol class="timeline">
+      {% for event in events %}
+      <li><span class="timeline-marker"></span><div class="timeline-card"><div class="timeline-top"><span class="status-pill">{{ event.get_event_type_display }}</span><time>{{ event.occurred_at|date:'d M Y, H:i' }}</time></div><h3>{{ event.description }}</h3><p>{% if event.location %}{{ event.location }} · {% endif %}Registrado por {{ event.recorded_by.get_full_name|default:event.recorded_by.username|default:'Usuario' }}</p></div></li>
+      {% empty %}<li class="timeline-empty"><div class="empty-state"><span>↝</span><h3>Sin eventos registrados</h3><p>Agregue el primer movimiento para construir la historia verificable del lote.</p></div></li>{% endfor %}
+    </ol>
+  </section>
+  <aside class="detail-sidebar">
+    <section class="panel">
+      <div class="panel-header"><div><p class="eyebrow">Materia prima</p><h2>Orígenes</h2></div></div>
+      <div class="origin-list">
+        {% for origin in origins %}<div class="origin-item"><span class="origin-icon">◎</span><div><strong>{{ origin.reception.producer.full_name }}</strong><small>{{ origin.reception.farm.name }} · {{ origin.reception.code }}</small><b>{{ origin.assigned_weight_kg }} kg</b></div></div>{% empty %}<div class="empty-inline">Este lote todavía no tiene recepciones asociadas.</div>{% endfor %}
+      </div>
+    </section>
+    <section class="panel qr-panel" data-qr-panel>
+      <p class="eyebrow">Acceso verificable</p><h2>Código QR</h2>
+      {% if timeline.lot.qr_token %}<img src="/api/v1/lots/{{ lot.id }}/qr-image/" alt="Código QR del lote {{ lot.code }}"><a href="/qr/{{ timeline.lot.qr_token }}/" target="_blank" rel="noopener">Abrir consulta pública →</a>{% else %}<div class="qr-placeholder"><span>▦</span><p>Genere un QR para compartir esta trazabilidad.</p></div>{% endif %}
+    </section>
+  </aside>
+</div>
+{% if can_write_operational_data %}<dialog class="modal" data-association-modal>
+  <form class="modal-card">
+    <div class="modal-header"><div><p class="eyebrow">Origen</p><h2>Asociar recepción</h2></div><button type="button" class="icon-button" data-close-association aria-label="Cerrar">×</button></div>
+    <div class="form-grid">
+      <div class="field-group is-wide"><label for="association-reception">Recepción validada <span class="required">*</span></label><select id="association-reception" name="reception_id" required></select></div>
+      <div class="field-group is-wide"><label for="association-weight">Peso que se asignará (kg) <span class="required">*</span></label><input id="association-weight" name="assigned_weight_kg" type="number" min="0.01" step="0.01" required></div>
+    </div>
+    <div class="form-error" data-association-error hidden></div>
+    <div class="modal-actions"><button type="button" class="button button-ghost" data-close-association>Cancelar</button><button type="submit" class="button button-primary">Asociar recepción</button></div>
+  </form>
+</dialog>{% endif %}
+{% endblock %}
+{% block scripts %}<script defer src="{% static 'js/lot-detail.js' %}"></script>{% endblock %}
